@@ -7,6 +7,7 @@ import com.example.todomanager.R
 
 /**
  * MainActivityのRecycleViewのViewHolder
+ * 1行分のViewをホールドする役割を持つ。
  */
 open class RecyclerViewHolder : RecyclerView.ViewHolder {
 

@@ -15,6 +15,10 @@ class TaskService {
         return dao.getAllTask()
     }
 
+    /**
+     * タスクを作成してDBに登録し、タスクを返却する。
+     * IDは自動裁判する。
+     */
     fun createTask(title: String, detail: String): Task {
         val uuid = UUID.randomUUID().toString()
         val task = Task(id = uuid, title = title, detail = detail)
