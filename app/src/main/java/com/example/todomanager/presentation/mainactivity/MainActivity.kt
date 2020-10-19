@@ -1,9 +1,13 @@
 package com.example.todomanager.presentation.mainactivity
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todomanager.R
@@ -11,15 +15,15 @@ import com.example.todomanager.domain.model.Task
 import com.example.todomanager.domain.service.TaskService
 import com.example.todomanager.infrastructure.repository.TaskDAO
 import com.example.todomanager.presentation.mainactivity.recycleview.RecyclerViewAdapter
+import com.example.todomanager.presentation.taskaddactivity.TaskAddActivity
+import com.example.todomanager.presentation.taskaddactivity.extraKeyTaskDetail
+import com.example.todomanager.presentation.taskaddactivity.extraKeyTaskTitle
 
 class MainActivity : AppCompatActivity() {
 
-    var taskList: List<Task> = listOf()
-    val taskService = TaskService(TaskDAO())
-    var adapter = RecyclerViewAdapter(taskList)
-
-    // TODO:タスク作成機能を作るまでの仮の動作のための変数。実装完了後、消すこと。
-    var taskCounter = 1
+    private var taskList: List<Task> = listOf()
+    private val taskService = TaskService(TaskDAO())
+    private var adapter = RecyclerViewAdapter(taskList)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,13 +47,26 @@ class MainActivity : AppCompatActivity() {
      * @param view クリックしたビュー
      */
     fun btnAddOnClick(view: View) {
-        val title = "title" + taskCounter.toString()
-        val detail = "detail" + taskCounter.toString()
-        taskCounter++
-        val task = taskService.createTask(title, detail)
-        taskList += task
-        setRecyclerViewAdapter(taskList)
-        Toast.makeText(this, "add button clicked", Toast.LENGTH_SHORT).show()
+
+        val taskAddActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
+                if (result?.resultCode == Activity.RESULT_OK) {
+                    // receive param
+                    val intent = result.data ?: return@registerForActivityResult
+                    val title: String =
+                        intent.getStringExtra(extraKeyTaskTitle) ?: return@registerForActivityResult
+                    val detail: String = intent.getStringExtra(extraKeyTaskDetail)
+                        ?: return@registerForActivityResult
+                    // create task
+                    val task: Task = taskService.createTask(title, detail)
+                    taskList += task
+                    setRecyclerViewAdapter(taskList)
+                }
+            }
+
+        val intent = Intent(this, TaskAddActivity::class.java)
+        taskAddActivityResultLauncher.launch(intent)
+
     }
 
     /**

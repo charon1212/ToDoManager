@@ -3,4 +3,8 @@
     <string name="btn_label_add">追加</string>
     <string name="btn_label_update">更新</string>
     <string name="btn_label_delete">削除</string>
+    <string name="label_text_title" >タイトル</string>
+    <string name="label_text_detail">詳細</string>
+    <string name="text_hint_task_title" >タスクのタイトルを入力</string>
+    <string name="text_hint_task_detail">タスクの詳細を入力</string>
 </resources>
